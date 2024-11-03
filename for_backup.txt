@@ -1,0 +1,88 @@
+-- use role accountadmin;
+use role sysadmin;
+
+drop table smoothies.public.orders;
+create or replace table smoothies.public.orders (
+       order_uid integer default smoothies.public.order_seq.nextval,
+       order_filled boolean default false,
+       name_on_order varchar(100),
+       ingredients varchar(200),
+       include_milk varchar(5),
+       sweet_type varchar(20),
+       sweet_level varchar(5),
+       constraint order_uid unique (order_uid),
+       order_ts timestamp_ltz default current_timestamp()
+);
+select * from SMOOTHIES.PUBLIC.ORDERS;
+
+-- select GRADER(step, (actual = expected), actual, expected, description) as graded_results from (
+--  SELECT 'DABW005' as step
+--  ,(select count(*) from SMOOTHIES.INFORMATION_SCHEMA.STAGES
+-- where stage_name like '%(Stage)') as actual
+--  , 2 as expected
+--  ,'There seem to be 2 SiS Apps' as description
+-- );
+
+-- Create a Simple User Defined Function (UDF)
+USE DATABASE UTIL_DB;
+create function sum_mystery_bag_vars (var1 number, var2 number, var3 number)
+returns number as 'select var1+var2+var3';
+
+select sum_mystery_bags_vars( 12, 36, 204 );
+
+-- Combine Local Variables & Function Calls
+set eeny = 4;
+set meeny = 67.2;
+set miney_mo = -39;
+
+select sum_mystery_bag_vars($eeny, $meeny, $miney_mo);
+
+-- 
+-- Set your worksheet drop lists
+
+-- Set these local variables according to the instructions
+set this = -10.5;
+set that = 2;
+set the_other =  1000;
+
+-- DO NOT EDIT ANYTHING BELOW THIS LINE
+select GRADER(step, (actual = expected), actual, expected, description) as graded_results from (
+  SELECT 'DABW006' as step
+ ,( select util_db.public.sum_mystery_bag_vars($this,$that,$the_other)) as actual
+ , 991.5 as expected
+ ,'Mystery Bag Function Output' as description
+);
+
+-- challenge.
+-- drop function NEUTRALIZE_WHINING(text);
+
+create function NEUTRALIZE_WHINING(phrase text)
+returns text as 'select initcap(phrase)';
+
+select NEUTRALIZE_WHINING('TesT thiS FUNCTION!');
+
+use role accountadmin;
+select GRADER(step, (actual = expected), actual, expected, description) as graded_results from (
+ SELECT 'DABW007' as step
+ ,( select hash(neutralize_whining('bUt mOm i wAsHeD tHe dIsHes yEsTeRdAy'))) as actual
+ , -4759027801154767056 as expected
+ ,'WHINGE UDF Works' as description
+);
+
+use role accountadmin;
+select GRADER(step, (actual = expected), actual, expected, description) as graded_results from (
+   SELECT 'DABW008' as step 
+   ,( select sum(hash_ing) from
+      (select hash(ingredients) as hash_ing
+       from smoothies.public.orders
+       where order_ts is not null 
+       and name_on_order is not null 
+       and (name_on_order = 'Kevin' and order_filled = FALSE and hash_ing = 7976616299844859825) 
+       or (name_on_order ='Divya' and order_filled = TRUE and hash_ing = -6112358379204300652)
+       or (name_on_order ='Xi' and order_filled = TRUE and hash_ing = 1016924841131818535))
+     ) as actual 
+   , 2881182761772377708 as expected 
+   ,'Followed challenge lab directions' as description
+); 
+
+use role sysadmin;
