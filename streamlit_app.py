@@ -41,7 +41,7 @@ fruit_list = ["Apple 🍎", "Avocado 🥑", "Banana 🍌", "Grapes 🍇",
                       "Strawberries 🍓", "Watermelon 🍉"]
 ingredients_list = st.multiselect(
     "**Choose up to 3 ingredients:**",
-    fuit_list,
+    fruit_list,
     max_selections=3
 )
 # st.write("Your favourite fruit is:", ingredients_list)
