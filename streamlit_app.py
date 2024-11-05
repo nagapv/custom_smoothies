@@ -36,9 +36,12 @@ if name_on_order:
 # )
 
 # Offering only limited choices internally.
+fruit_list = ["Apple 🍎", "Avocado 🥑", "Banana 🍌", "Grapes 🍇",
+                  "Kiwi 🥝", "Mango 🥭", "Peaches 🍑", "Pineapple 🍍",
+                      "Strawberries 🍓", "Watermelon 🍉"]
 ingredients_list = st.multiselect(
     "**Choose up to 3 ingredients:**",
-    ["Apple 🍎", "Banana 🍌", "Mango 🥭", "Peaches 🍑", "Pineapple 🍍", "Strawberries 🍓"],
+    fuit_list,
     max_selections=3
 )
 # st.write("Your favourite fruit is:", ingredients_list)
