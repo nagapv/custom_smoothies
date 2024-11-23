@@ -25,6 +25,16 @@ if name_on_order:
 # Reading choices from Snowflake table.
 # my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
 # st.dataframe(data=my_dataframe, use_container_width=True)
+# Reading from new table.
+my_dataframe = session.table("smoothies.public.item_options")
+df = my_dataframe.to_pandas()
+
+# Global variable
+PRICE = df[df['ITEM_NAME']=='Base Price']['ITEM_PRICE'].squeeze()
+
+_ignore = ['Base Price','Milk','Sugar','Sugarfree','Honey']
+fruit_list = df[df['ITEM_NAME'].isin(_ignore)==False].ITEM_NAME.to_list()
+# st.write(fruit_list)
 
 # For doing the same in Streamlit in Snowflake.
 # my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
@@ -35,10 +45,10 @@ if name_on_order:
 #     my_dataframe, max_selections=5
 # )
 
-# Offering only limited choices internally.
-fruit_list = ["Apple 🍎", "Avocado 🥑", "Banana 🍌", "Grapes 🍇",
-                  "Kiwi 🥝", "Mango 🥭", "Peaches 🍑", "Pineapple 🍍",
-                      "Strawberries 🍓", "Watermelon 🍉"]
+# # Offering only limited choices internally.
+# fruit_list = ["Apple 🍎", "Avocado 🥑", "Banana 🍌", "Grapes 🍇",
+#                   "Kiwi 🥝", "Mango 🥭", "Peaches 🍑", "Pineapple 🍍",
+#                       "Strawberries 🍓", "Watermelon 🍉"]
 ingredients_list = st.multiselect(
     "**Choose up to 3 ingredients:**",
     fruit_list,
@@ -50,6 +60,8 @@ ingredients_list = st.multiselect(
 
 st.write("**Add some milk 🥛?**")
 include_milk = st.checkbox("Yes please!")
+if include_milk:
+    PRICE += df[df['ITEM_NAME']=='Milk']['ITEM_PRICE'].squeeze()
 
 sweet_type = st.radio("**Choose your sweetener:**",
                       ["Sugar","Sugarfree","Honey","No sweetener!"])
@@ -58,6 +70,9 @@ if sweet_type != "No sweetener!":
     st.write("Your sweetener:", sweet_type)
     sweet_level = st.slider("**How much of sweetner?**",
                                 0, 150, value=100, step=25)
+    if sweet_level > 0:
+        _sweetener_price = df[df['ITEM_NAME']==sweet_type]['ITEM_PRICE'].squeeze()
+        PRICE += _sweetener_price*(sweet_level/100)
 else:
     st.write("Your sweetener: None, healthy choise!")
     sweet_level = 0
@@ -66,17 +81,22 @@ if (ingredients_list and sweet_type):
     # st.write(ingredients_list)
     # st.text(ingredients_list)
 
+    PRICE += df[df['ITEM_NAME'].isin(ingredients_list)]['ITEM_PRICE'].sum()
+    total_amount = "%.2f" % round(PRICE, 2)
+    
+    st.write("*Your total cost will be **${0}**, {1}!*".format(total_amount, name_on_order))
+    
     ingredients_string = ", ".join(ingredients_list)
 
     # st.write(ingredients_string)
 
     my_insert_stmt = """insert into smoothies.public.orders(
-                name_on_order, ingredients, include_milk, sweet_type, sweet_level
+                name_on_order, ingredients, include_milk, sweet_type, sweet_level, total_amount
                 )
             values (
             '""" + name_on_order + """', '""" + ingredients_string + """',
             '""" + str(include_milk).capitalize() + """', '""" + sweet_type + """',
-            '""" + str(sweet_level) + """'
+            '""" + str(sweet_level) + """', '""" + str(total_amount) + """'
             )"""
 
     # st.write(my_insert_stmt)
