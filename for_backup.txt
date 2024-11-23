@@ -10,10 +10,46 @@ create or replace table smoothies.public.orders (
        include_milk varchar(5),
        sweet_type varchar(20),
        sweet_level varchar(5),
+       total_amount float(5),
        constraint order_uid unique (order_uid),
        order_ts timestamp_ltz default current_timestamp()
 );
 select * from SMOOTHIES.PUBLIC.ORDERS;
+
+create or replace table smoothies.public.item_options (
+    item_name varchar(100),
+    item_price float,
+    in_stock boolean default true
+);
+
+insert into item_options
+values ('Base Price', 2.00, true);
+
+insert into item_options
+values ('Milk', 0.26, true);
+
+insert into item_options
+values ('Apple 🍎', 0.48, true);
+insert into item_options
+values ('Avocado 🥑', 0.27, true);
+insert into item_options
+values ('Banana 🍌', 0.13, true);
+insert into item_options
+values ('Grapes 🍇', 0.55, false);
+insert into item_options
+values ('Kiwi 🥝', 0.27, true);
+insert into item_options
+values ('Mango 🥭', 0.14, true);
+insert into item_options
+values ('Peaches 🍑', 0.68, true);
+insert into item_options
+values ('Pineapple 🍍', 0.14, true);
+insert into item_options
+values ('Strawberries 🍓', 0.60, true);
+insert into item_options
+values ('Watermelon 🍉', 0.14, false);
+
+select * from smoothies.public.item_options;
 
 -- select GRADER(step, (actual = expected), actual, expected, description) as graded_results from (
 --  SELECT 'DABW005' as step
