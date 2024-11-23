@@ -49,6 +49,13 @@ values ('Strawberries 🍓', 0.60, true);
 insert into item_options
 values ('Watermelon 🍉', 0.14, false);
 
+insert into item_options
+values ('Sugar', 0.11, false);
+insert into item_options
+values ('Sugarfree', 1.15, false);
+insert into item_options
+values ('Honey', 0.68, false);
+
 select * from smoothies.public.item_options;
 
 -- select GRADER(step, (actual = expected), actual, expected, description) as graded_results from (
